@@ -1,7 +1,8 @@
 package com.polygon.chess
 
+typealias Board = ByteArray
 class ChessGame {
-    val board: ByteArray = ByteArray(64)
+    val board: Board = ByteArray(64)
     var activeSide: Byte = 0
     var castlingOptions: Byte = CastlingOptions.ALL
     var enPassantTargetSquare: Int = -1
@@ -16,7 +17,7 @@ enum class MoveUpdateStatus {
 }
 
 class GameController {
-    fun processMove(game: ChessGame, move: String): Pair<MoveUpdateStatus, String> {
+    fun makeMove(game: ChessGame, move: String): Pair<MoveUpdateStatus, String> {
         return MoveUpdateStatus.OK to ""
     }
 }
