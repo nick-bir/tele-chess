@@ -5,11 +5,11 @@ import kotlin.experimental.and
 
 fun gameToFen(game: ChessGame): String {
     val result = StringBuilder(90)
-    result.append(boardToFen(game.board, result))
+    result.appendBoard(game.board)
     result.append(' ')
     result.append(if (game.activeSide == Side.WHITE) 'w' else 'b')
     result.append(' ')
-    result.append(castlingOptionsToFen(game, result))
+    result.appendCastlingOptions(game)
     result.append(' ')
     result.append(squareIdxToStr(game.enPassantTargetSquare))
     result.append(' ')
@@ -19,7 +19,7 @@ fun gameToFen(game: ChessGame): String {
     return result.toString()
 }
 
-fun boardToFen(board: Board, builder: StringBuilder) {
+private fun StringBuilder.appendBoard(board: Board) {
     for (rank in 7 downTo 0) {
         var numberOfBlanks = 0
         for (file in 0..7) {
@@ -28,50 +28,35 @@ fun boardToFen(board: Board, builder: StringBuilder) {
                 numberOfBlanks++
             } else {
                 if (numberOfBlanks > 0) {
-                    builder.append(numberOfBlanks)
+                    this.append(numberOfBlanks)
+                    numberOfBlanks = 0
                 }
+                this.append(pieceToString(board[squareIdx]))
             }
         }
         if (numberOfBlanks > 0) {
-            builder.append(numberOfBlanks)
+            this.append(numberOfBlanks)
         }
-        builder.append('/')
+        if (rank > 0) {
+            this.append('/')
+        }
     }
 }
 
-fun pieceToString(piece: Byte): Char {
-    val isBlack = piece > 6
-    val pieceIdx = if (isBlack) piece - 6 else piece
-    val char = when (pieceIdx.toByte()) {
-        Pieces.W_PAWN -> 'P'
-        Pieces.W_ROOK -> 'R'
-        Pieces.W_KNIGHT -> 'N'
-        Pieces.W_BISHOP -> 'B'
-        Pieces.W_QUEEN -> 'Q'
-        Pieces.W_KING -> 'K'
-        else -> throw IllegalStateException("Unable to parse piece with code $piece")
-    }
-    return if (isBlack) {
-        char + 32
-    } else {
-        char
-    }
-}
-
-fun castlingOptionsToFen(game: ChessGame, builder: StringBuilder) {
+private fun StringBuilder.appendCastlingOptions(game: ChessGame) {
     if (game.castlingOptions == CastlingOptions.NONE) {
-        builder.append('-')
+        this.append('-')
     }
     if (game.castlingOptions and CastlingOptions.W_KING > 0) {
-        builder.append('K')
+        this.append('K')
     }
     if (game.castlingOptions and CastlingOptions.W_QUEEN > 0) {
-        builder.append('Q')
+        this.append('Q')
     }
     if (game.castlingOptions and CastlingOptions.B_KING > 0) {
-        builder.append('k')
+        this.append('k')
     }
     if (game.castlingOptions and CastlingOptions.B_QUEEN > 0) {
-        builder.append('K')
+        this.append('q')
     }
 }
